@@ -8,6 +8,8 @@ app.use(require('./login'));
 app.use(require('./user'));
 app.use(require('./bank'));
 app.use(require('./associate'));
+app.use(require('./states'));
+app.use(require('./baucher'));
 
 
 

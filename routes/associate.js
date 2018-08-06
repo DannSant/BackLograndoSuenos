@@ -8,7 +8,7 @@ const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 //=======================
 // PETICIONES GET
 //=======================
-app.get('/associate', verificaToken, (req, res) => {
+app.get('/associate', (req, res) => {
 
     let id = req.query.id;
 
@@ -70,9 +70,11 @@ app.get('/associate/all', (req, res) => {
 app.post('/associate', (req, res) => {
     let body = req.body;
 
+    let hasPayment = ((body.payAmmount) ? true : false);
+
+
     let associate = new Associate({
         name: body.name,
-        email: body.email,
         cellphone: body.cellphone,
         bank: body.bank,
         account: body.account,
@@ -82,9 +84,11 @@ app.post('/associate', (req, res) => {
         rfc: body.rfc,
         address: body.address,
         birthDate: body.birthDate,
-        hasPayment: body.hasPayment,
+        hasPayment: hasPayment,
         payAmmount: body.payAmmount,
         state: body.state,
+        paymentDate: body.paymentDate,
+        paymentNumber: body.paymentNumber,
         creationDate: new Date()
     });
 

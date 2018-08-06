@@ -6,7 +6,7 @@ autoIncrement.initialize(mongoose.connection);
 var associateSchema = new Schema({
     id: { type: Number },
     name: { type: String, required: [true, "El nombre es necesario"] },
-    email: { type: String, unique: true, required: [true, "El email es necesario"] },
+    email: { type: String },
     cellphone: { type: String, required: [true, 'El numero de contacto es necesario'] },
     bank: { type: Schema.Types.ObjectId, ref: 'Bank', required: true },
     account: { type: String, required: [true, 'El numero de cuenta es necesario'] },
@@ -18,6 +18,9 @@ var associateSchema = new Schema({
     birthDate: { type: Date, required: [true, "La fecha de nacimiento es necesaria"] },
     hasPayment: { type: Boolean, default: true },
     payAmmount: { type: Number, required: false },
+    paymentDate: { type: Date },
+    paymentNumber: { type: String },
+    paymentBaucher: { type: String },
     state: { type: String, required: [true, 'El estado es necesario'] },
     creationDate: { type: Date },
     status: { type: Boolean, default: true }
