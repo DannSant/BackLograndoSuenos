@@ -28,8 +28,8 @@ app.use(require("./routes/index"));
 
 
 //servidor
-app.listen(3000, () => {
-    console.log("Levantando servidor en puerto 3000. Status:", 'online'.green)
+app.listen(process.env.PORT, () => {
+    console.log(`Levantando servidor en puerto ${process.env.PORT}. Status:`, 'online'.green)
 });
 
 //BD

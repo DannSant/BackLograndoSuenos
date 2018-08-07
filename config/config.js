@@ -3,6 +3,12 @@
 //==============
 process.env.NODE_ENV = process.env.NODE_ENV || 'dev'
 
+//=========================
+//PUERTO BACKEND
+//=======================
+process.env.PORT = process.env.PORT || 3000;
+
+
 //===============
 // JWT
 //==============
