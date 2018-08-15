@@ -74,10 +74,9 @@ app.post('/user', (req, res) => {
     let usuario = new User({
         name: body.name,
         email: body.email,
-        cellphone: body.cellphone,
-        sex: body.sex,
+        username: body.username,
         password: bcrypt.hashSync(body.password, 10),
-        rol: body.rol
+        role: body.role
     });
 
     usuario.save((error, usuarioDB) => {
@@ -140,9 +139,9 @@ app.put('/user/:id', [verificaToken], function(req, res) {
     let body = {};
 
     if (req.body.password == '') {
-        body = _.pick(req.body, ['name', 'cellphone', 'sex', 'role']);
+        body = _.pick(req.body, ['name', 'username', 'role']);
     } else {
-        body = _.pick(req.body, ['name', 'cellphone', 'sex', 'role', 'password']);
+        body = _.pick(req.body, ['name', 'username', 'role', 'password']);
         body.password = bcrypt.hashSync(body.password, 10);
     }
 

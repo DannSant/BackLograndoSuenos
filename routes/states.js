@@ -36,7 +36,8 @@ const STATES = [
     { code: "28", name: "Tlaxcala" },
     { code: "29", name: "Veracruz" },
     { code: "30", name: "Yucatán" },
-    { code: "31", name: "Zacatecas" }
+    { code: "31", name: "Zacatecas" },
+    { code: "32", name: "CDMX" }
 ];
 
 
