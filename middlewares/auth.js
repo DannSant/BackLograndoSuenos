@@ -27,7 +27,7 @@ let verificaToken = (req, res, next) => {
 //==============
 
 let verificaAdmin = (req, res, next) => {
-    let role = req.usuario.rol;
+    let role = req.usuario.role;
 
     if (role != "ADMIN_ROLE") {
         return res.status(401).json({

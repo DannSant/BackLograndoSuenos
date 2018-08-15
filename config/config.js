@@ -8,6 +8,15 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'dev'
 //=======================
 process.env.PORT = process.env.PORT || 3000;
 
+//=============================
+//Link para afiliados
+//============================
+if(process.env.NODE_ENV=="dev"){
+    process.env.ASSOCIATE_LINK="http://localhost:4200/register"
+}else {
+    process.env.ASSOCIATE_LINK="http://lograndosuenos7/register"
+}
+
 
 //===============
 // JWT

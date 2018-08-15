@@ -14,6 +14,7 @@ var userSchema = new Schema({
     username: { type: String, required: [true, "El usuario es necesario"] },
     password: { type: String, required: [true, "El password es necesario"] },
     role: { type: String, required: true, default: "USER_ROLE", enum: rolesValidos },
+    associateLink: {type:String, required:false},
     status: { type: Boolean, default: true }
 });
 
