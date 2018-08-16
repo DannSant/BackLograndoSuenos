@@ -8,6 +8,7 @@ const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 //=======================
 // PETICIONES GET
 //=======================
+//regresa un asociado por id
 app.get('/associate', (req, res) => {
 
     let id = req.query.id;
@@ -33,6 +34,7 @@ app.get('/associate', (req, res) => {
         })
 })
 
+//regresa todos los asociados activos
 app.get('/associate/all', (req, res) => {
 
     let desde = req.query.desde || 0;
@@ -42,6 +44,38 @@ app.get('/associate/all', (req, res) => {
     limite = Number(limite);
 
     Associate.find({ status: true })
+        .skip(desde)
+        .limit(limite)
+        .exec((error, associates) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    errorCode: 500,
+                    error
+                })
+            }
+
+            Associate.count({ status: true }, (e, conteo) => {
+                res.json({
+                    ok: true,
+                    records: conteo,
+                    data: associates
+                })
+            })
+
+        })
+});
+
+//regresa los asociados nuevos (que no tengan email)
+app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
+
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let limite = req.query.limite || 20;
+    limite = Number(limite);
+
+    Associate.find({ email: null })
         .skip(desde)
         .limit(limite)
         .exec((error, associates) => {
@@ -75,6 +109,7 @@ app.post('/associate', (req, res) => {
 
     let associate = new Associate({
         name: body.name,
+        personalEmail: body.personalEmail,
         cellphone: body.cellphone,
         bank: body.bank,
         account: body.account,
@@ -182,7 +217,7 @@ app.post('/associate/resetId', (req, res) => {
 //=======================
 app.put('/associate/:id', function(req, res) {
     let code = req.params.id;
-    let body = _.pick(req.body, ['name', 'email', 'cellphone', 'bank', 'account', 'clabe', 'card', 'curp', 'rfc', 'address', 'birthDate', 'hasPayment', 'payAmmount']);
+    let body = _.pick(req.body, ['name', 'personalEmail', 'cellphone', 'bank', 'account', 'clabe', 'card', 'curp', 'rfc', 'address', 'birthDate', 'hasPayment', 'payAmmount']);
     //console.log(req.body);
 
     Associate.findByIdAndUpdate(code, body, { new: true, runValidators: true }, (error, associateDB) => {

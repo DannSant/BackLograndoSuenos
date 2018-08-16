@@ -2,7 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const _ = require('underscore');
 const app = express();
-const User = require('../models/user')
+const User = require('../models/user');
+const Associate = require('../models/associate');
 const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 
 
@@ -10,7 +11,7 @@ const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 //=======================
 // PETICIONES GET
 //=======================
-app.get('/user', [verificaToken,verificaAdmin], (req, res) => {
+app.get('/user', [verificaToken, verificaAdmin], (req, res) => {
 
     let id = req.query.id;
 
@@ -34,7 +35,7 @@ app.get('/user', [verificaToken,verificaAdmin], (req, res) => {
         })
 })
 
-app.get('/user/all', [verificaToken,verificaAdmin], (req, res) => {
+app.get('/user/all', [verificaToken, verificaAdmin], (req, res) => {
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -68,54 +69,64 @@ app.get('/user/all', [verificaToken,verificaAdmin], (req, res) => {
 //=======================
 // PETICIONES POST
 //=======================
-app.post('/user', [verificaToken,verificaAdmin], (req, res) => {
+
+//Crea un usuario y lo vincula con el associate_id recibido dentro del mismo objeto usuario
+app.post('/user', [verificaToken, verificaAdmin], (req, res) => {
     let body = req.body;
-     
+    let associateId = body.associate._id
     let usuario = new User({
         name: body.name,
         email: body.email,
         username: body.username,
         password: bcrypt.hashSync(body.password, 10),
         role: body.role,
-        associateLink: null
+        associate: associateId
     });
 
+    //Paso 1 guardamos usuario en DB
     usuario.save((error, usuarioDB) => {
 
         if (error) {
             return res.status(409).json({
                 ok: false,
                 error,
-                errorMsg:"Error al crear usuario"
+                errorMsg: "Error al crear usuario"
             })
         }
-        //usuarioDB.password = null;
 
-        let id = usuarioDB._id;
-        let associateLink = process.env.ASSOCIATE_LINK + "/" + id;
+        //Paso 2, despues de validar que no hay errores, buscamos al asociado recibido
+        Associate.findOne({ _id: associateId })
+            .exec((errorAssociate, associateDB) => {
+                if (errorAssociate) {
+                    return res.status(409).json({
+                        ok: false,
+                        error,
+                        errorMsg: "Error al asignar email al afiliado creado"
+                    })
+                }
 
-        usuarioDB.associateLink=associateLink;
+                //Paso 3, si no hay errores, actualizamos el email del asociado con el email del usuario recibido y guardamos
+                associateDB.email = usuarioDB.email;
+                associateDB.save((error2, savedAssociate) => {
+                    if (error2) {
+                        return res.status(409).json({
+                            ok: false,
+                            error,
+                            errorMsg: "Error al asignar link al usuario creado"
+                        })
+                    }
 
-        usuarioDB.save((error2,usuarioConLink)=>{
-            if(error2){
-                return res.status(409).json({
-                    ok: false,
-                    error,
-                    errorMsg:"Error al asignar link al usuario creado"
+                    //Paso 4, si todo esta bien, regresamos al usuario y al afiliado
+                    res.json({
+                        ok: true,
+                        data: usuarioDB,
+                        associate: savedAssociate
+                    });
                 })
-            }
-            res.json({
-                ok: true,
-                data: usuarioConLink
             });
-        })
-
-
-        
-
     });
 
-})
+});
 
 app.post('/user/delete/:id', [verificaToken, verificaAdmin], function(req, res) {
     let id = req.params.id;

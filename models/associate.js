@@ -7,6 +7,7 @@ var associateSchema = new Schema({
     id: { type: Number },
     name: { type: String, required: [true, "El nombre es necesario"] },
     email: { type: String },
+    personalEmail: { type: String },
     cellphone: { type: String, required: [true, 'El numero de contacto es necesario'] },
     bank: { type: Schema.Types.ObjectId, ref: 'Bank', required: true },
     account: { type: String, required: [true, 'El numero de cuenta es necesario'] },
