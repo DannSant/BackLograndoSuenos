@@ -46,6 +46,7 @@ app.put('/baucher/:id', function(req, res) {
     let archivo = req.files.archivo
     let nombreArchivo = archivo.name.split(".");
     let extension = nombreArchivo[nombreArchivo.length - 1];
+    extension = extension.toLowerCase();
     //extensiones permitidas
     let extensionesValidas = ["jpg", "png", "gif", "jpeg"];
 

@@ -10,6 +10,7 @@ app.use(require('./bank'));
 app.use(require('./associate'));
 app.use(require('./states'));
 app.use(require('./baucher'));
+app.use(require('./email'));
 
 
 
