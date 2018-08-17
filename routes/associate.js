@@ -46,6 +46,7 @@ app.get('/associate/all', (req, res) => {
     Associate.find({ status: true })
         .skip(desde)
         .limit(limite)
+        .populate('bank')
         .exec((error, associates) => {
             if (error) {
                 return res.status(500).json({

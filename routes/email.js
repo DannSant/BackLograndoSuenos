@@ -12,62 +12,62 @@ const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 //=======================
 // PETICIONES POST
 //=======================
-app.post('/email/welcome', (req, res) => {  
+app.post('/email/welcome', (req, res) => {
     let body = req.body;
-    
+
     let userEmail = body.userEmail;
-    if(!userEmail){
+    if (!userEmail) {
         return res.status(409).json({
             ok: false,
             error,
-            errorMsg:"Falta el campo de userEmail"
+            errorMsg: "Falta el campo de userEmail"
         })
     }
 
     let personalEmail = body.personalEmail;
-    if(!personalEmail){
+    if (!personalEmail) {
         return res.status(409).json({
             ok: false,
             error,
-            errorMsg:"Falta el campo de personalEmail"
+            errorMsg: "Falta el campo de personalEmail"
         })
     }
 
     let userName = body.userName;
-    if(!userName){
+    if (!userName) {
         return res.status(409).json({
             ok: false,
             error,
-            errorMsg:"Falta el campo de userName"
+            errorMsg: "Falta el campo de userName"
         })
     }
 
     let userUserName = body.userUserName;
-    if(!userUserName){
+    if (!userUserName) {
         return res.status(409).json({
             ok: false,
             error,
-            errorMsg:"Falta el campo de userUserName"
+            errorMsg: "Falta el campo de userUserName"
         })
     }
     let userPassword = body.userPassword;
-    if(!userPassword){
+    if (!userPassword) {
         return res.status(409).json({
             ok: false,
             error,
-            errorMsg:"Falta el campo de userPassword"
+            errorMsg: "Falta el campo de userPassword"
         })
     }
 
     let adminEmail = "pruebas@lograndosuenos7.com";
     let adminPassword = "Mmadlajca1*";
-    
+
     let subject = `Bienvenido ${userName} a Logrando Sueños 7 🤗`
-    let htmlBody = createHtmlBody(userEmail,userName,userUserName,userPassword);
+    let htmlBody = createHtmlBody(userEmail, userName, userUserName, userPassword);
 
 
-    let account = {user:adminEmail ,pass:adminPassword}
-    // create reusable transporter object using the default SMTP transport
+    let account = { user: adminEmail, pass: adminPassword }
+        // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
         host: 'servidor3398.tl.controladordns.com',
         port: 465,
@@ -80,7 +80,7 @@ app.post('/email/welcome', (req, res) => {
 
     // setup email data with unicode symbols
     let mailOptions = {
-        from: '"Hansel" <pruebas@lograndosuenos7.com>', // sender address
+        from: '"Staff LograndoSueños7" <pruebas@lograndosuenos7.com>', // sender address
         to: personalEmail, // list of receivers
         subject: subject, // Subject line
         text: 'Hello world?', // plain text body
@@ -100,7 +100,7 @@ app.post('/email/welcome', (req, res) => {
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 
         res.json({
-            ok: true,            
+            ok: true,
             data: info
         });
 
@@ -120,12 +120,12 @@ module.exports = app;
 //=========================
 //Funciones
 //==========================
-function createHtmlBody(userEmail,userName,userUserName,userPassword){
-    let htmlbody =`
+function createHtmlBody(userEmail, userName, userUserName, userPassword) {
+    let htmlbody = `
     <h1>Hola ${userName} ! </h1>
     
     <p>Este correo es para notificarte que tu registro en Logrando Sueños 7 ha sido completado</p>
-    <p>Puedes dirigirte al sitio http://lograndosuenos.com/home e iniciar sesion con los siguientes datos</p>
+    <p>Puedes dirigirte al sitio http://lograndosuenos7.com/home e iniciar sesion con los siguientes datos</p>
 
     <table>
         <tr>
