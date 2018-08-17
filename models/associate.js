@@ -22,7 +22,7 @@ var associateSchema = new Schema({
     paymentDate: { type: Date },
     paymentNumber: { type: String },
     paymentBaucher: { type: String },
-    state: { type: String, required: [true, 'El estado es necesario'] },
+    state: { type: Schema.Types.ObjectId, ref: 'State', required: true },
     creationDate: { type: Date },
     status: { type: Boolean, default: true }
 });

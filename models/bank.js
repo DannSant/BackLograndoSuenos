@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 var bankSchema = new Schema({
     name: { type: String, required: [true, "El nombre es necesario"] },
-    digits: { type: Number, required: [true, 'Latitud  es necesaria'] },
+    digits: { type: Number, required: [true, 'Digits  es necesaria'] },
     status: { type: Boolean, default: true }
 });
 

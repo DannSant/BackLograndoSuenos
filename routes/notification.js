@@ -2,20 +2,20 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const _ = require('underscore');
 const app = express();
-const Associate = require('../models/associate')
+const Notification = require('../models/notification')
 const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 
 //=======================
 // PETICIONES GET
 //=======================
-//regresa un asociado por id
-app.get('/associate', (req, res) => {
+//regresa una notificacion por id
+app.get('/notification', (req, res) => {
 
     let id = req.query.id;
 
 
     Associate.findOne({ _id: id })
-        .exec((error, associate) => {
+        .exec((error, notification) => {
             if (error) {
                 return res.status(500).json({
                     ok: false,
@@ -27,49 +27,26 @@ app.get('/associate', (req, res) => {
             res.json({
                 ok: true,
                 records: 1,
-                data: associate
+                data: notification
             });
 
 
         })
 });
 
-//regresa todos los asociados activos
-app.get('/associate/all', (req, res) => {
+//regresa todas las notificaciones de la base de datos
+//queryParams: status, user
+app.get('/notification/all', (req, res) => {
 
-    let desde = req.query.desde || 0;
-    desde = Number(desde);
+    let filter = {};
 
-    let limite = req.query.limite || 99;
-    limite = Number(limite);
+    if(req.query.status){
+        filter.status = req.query.status;
+    }
 
-    Associate.find({ status: true })
-        .skip(desde)
-        .limit(limite)
-        .populate('bank')
-        .populate('state')
-        .exec((error, associates) => {
-            if (error) {
-                return res.status(500).json({
-                    ok: false,
-                    errorCode: 500,
-                    error
-                })
-            }
-
-            Associate.count({ status: true }, (e, conteo) => {
-                res.json({
-                    ok: true,
-                    records: conteo,
-                    data: associates
-                })
-            })
-
-        })
-});
-
-//regresa los asociados nuevos (que no tengan email)
-app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
+    if(req.query.user){
+        filter.user = req.query.user;
+    }
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -77,10 +54,10 @@ app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
     let limite = req.query.limite || 20;
     limite = Number(limite);
 
-    Associate.find({ email: null })
+    Notification.find(filter)
         .skip(desde)
         .limit(limite)
-        .exec((error, associates) => {
+        .exec((error, notifications) => {
             if (error) {
                 return res.status(500).json({
                     ok: false,
@@ -89,11 +66,65 @@ app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
                 })
             }
 
-            Associate.count({ status: true }, (e, conteo) => {
+            Notification.count(filter, (e, conteo) => {
                 res.json({
                     ok: true,
                     records: conteo,
-                    data: associates
+                    data: notifications
+                })
+            })
+
+        })
+});
+
+//regresa todas las notificaciones de la base de datos
+//queryParams:  user
+app.get('/notification/mine', (req, res) => {
+
+
+   
+    let user = req.query.user;
+    
+
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let limite = req.query.limite || 20;
+    limite = Number(limite);
+
+    Notification.find({
+        $or: [
+          { 'user': user },
+          { 'broadcast': true }
+        ],
+        $and:[
+            {'status':true}
+        ]
+      })
+        .skip(desde)
+        .limit(limite)
+        .exec((error, notifications) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    errorCode: 500,
+                    error
+                })
+            }
+
+            Notification.count({
+                $or: [
+                  { 'user': user },
+                  { 'broadcast': true }
+                ],
+                $and:[
+                    {'status':true}
+                ]
+              }, (e, conteo) => {
+                res.json({
+                    ok: true,
+                    records: conteo,
+                    data: notifications
                 })
             })
 
@@ -103,34 +134,20 @@ app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
 //=======================
 // PETICIONES POST
 //=======================
-app.post('/associate', (req, res) => {
+//Genera una notificacion
+app.post('/notification', (req, res) => {
     let body = req.body;
 
-    let hasPayment = ((body.payAmmount) ? true : false);
-
-   
-
-    let associate = new Associate({
-        name: body.name,
-        personalEmail: body.personalEmail,
-        cellphone: body.cellphone,
-        bank: body.bank,
-        account: body.account,
-        clabe: body.clabe,
-        card: body.card,
-        curp: body.curp,
-        rfc: body.rfc,
-        address: body.address,
-        birthDate: body.birthDate,
-        hasPayment: hasPayment,
-        payAmmount: body.payAmmount,
-        state: body.state,
-        paymentDate: body.paymentDate,
-        paymentNumber: body.paymentNumber,
+   let notification = new Notification({
+        title: body.title,
+        type: body.type,
+        text: body.text,
+        userTo: body.userTo,
+        broadcast: body.broadcast,        
         creationDate: new Date()
     });
 
-    associate.save((error, associateDB) => {
+    notification.save((error, notificationDB) => {
 
         if (error) {
             return res.status(500).json({
@@ -138,19 +155,19 @@ app.post('/associate', (req, res) => {
                 errorCode: 500,
                 error
             })
-        }
-        //usuarioDB.password = null;
+        }      
 
         res.json({
             ok: true,
-            data: associateDB
+            data: notificationDB
         })
 
     });
 
 });
 
-app.post('/associate/delete/:id', function(req, res) {
+//Cambia el estatus de una notificacion a false
+app.post('/notification/delete/:id', function(req, res) {
     let id = req.params.id;
 
     let body = _.pick(req.body, ['status']);
@@ -158,7 +175,7 @@ app.post('/associate/delete/:id', function(req, res) {
     body.status = false
 
 
-    Associate.findByIdAndUpdate(id, body, { new: true }, (error, associateDB) => {
+    Notification.findByIdAndUpdate(id, body, { new: true }, (error, notificationDB) => {
         if (error) {
             return res.status(500).json({
                 ok: false,
@@ -167,63 +184,35 @@ app.post('/associate/delete/:id', function(req, res) {
             })
         }
 
-        if (!associateDB) {
+        if (!notificationDB) {
             return res.status(400).json({
                 ok: false,
                 errorCode: 400,
                 error: {
-                    message: "No se encontró al afiliado a borrar"
+                    message: "No se encontró la notificacion a borrar"
                 }
             })
         }
 
         res.json({
             ok: true,
-            data: associateDB
+            data: notificationDB
         });
 
     });
 });
-
-app.post('/associate/resetId', (req, res) => {
-    //let Associate = connection.model('Book', bookSchema),
-    associate = new Associate();
-
-    associate.save(function(err) {
-
-        // book._id === 100 -> true
-
-        associate.nextCount(function(err, count) {
-
-            // count === 101 -> true
-
-            associate.resetCount(function(err, nextCount) {
-
-                // nextCount === 100 -> true
-
-                res.json({
-                    ok: true,
-                    nextCount: nextCount,
-                    count: count
-                });
-
-            });
-
-        });
-
-    });
-})
 
 
 //=======================
 // PETICIONES PUT
 //=======================
-app.put('/associate/:id', function(req, res) {
+//modifica una notificion, solamente titulo o texto o usuario o broadcast
+app.put('/notification/:id', function(req, res) {
     let code = req.params.id;
-    let body = _.pick(req.body, ['name', 'personalEmail', 'cellphone', 'bank', 'account', 'clabe', 'card', 'curp', 'rfc', 'address', 'birthDate', 'hasPayment', 'payAmmount']);
+    let body = _.pick(req.body, ['title', 'text', 'userTo', 'broadcast']);
     //console.log(req.body);
 
-    Associate.findByIdAndUpdate(code, body, { new: true, runValidators: true }, (error, associateDB) => {
+    Notification.findByIdAndUpdate(code, body, { new: true, runValidators: true }, (error, notificationDB) => {
         if (error) {
             return res.status(500).json({
                 ok: false,
@@ -232,24 +221,23 @@ app.put('/associate/:id', function(req, res) {
             })
         }
 
-        if (!associateDB) {
+        if (!notificationDB) {
             return res.status(400).json({
                 ok: false,
                 errorCode: 400,
                 error: {
-                    message: "No se encontró al afiliado a actualizar"
+                    message: "No se encontró la notificacion a actualizar"
                 }
             })
         }
 
         res.json({
             ok: true,
-            data: associateDB
+            data: notificationDB
         });
 
     });
 });
-
 
 //=======================
 // Exportar rutas
