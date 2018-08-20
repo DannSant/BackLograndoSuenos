@@ -35,17 +35,21 @@ app.get('/notification', (req, res) => {
 });
 
 //regresa todas las notificaciones de la base de datos
-//queryParams: status, user
+//queryParams: status, user, broadcast
 app.get('/notification/all', (req, res) => {
 
     let filter = {};
 
-    if(req.query.status){
+    if (req.query.status) {
         filter.status = req.query.status;
     }
 
-    if(req.query.user){
+    if (req.query.user) {
         filter.user = req.query.user;
+    }
+
+    if (req.query.broadcast) {
+        filter.broadcast = req.query.broadcast;
     }
 
     let desde = req.query.desde || 0;
@@ -82,9 +86,9 @@ app.get('/notification/all', (req, res) => {
 app.get('/notification/mine', (req, res) => {
 
 
-   
+
     let user = req.query.user;
-    
+
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -93,14 +97,14 @@ app.get('/notification/mine', (req, res) => {
     limite = Number(limite);
 
     Notification.find({
-        $or: [
-          { 'user': user },
-          { 'broadcast': true }
-        ],
-        $and:[
-            {'status':true}
-        ]
-      })
+            $or: [
+                { 'user': user },
+                { 'broadcast': true }
+            ],
+            $and: [
+                { 'status': true }
+            ]
+        })
         .skip(desde)
         .limit(limite)
         .exec((error, notifications) => {
@@ -114,13 +118,60 @@ app.get('/notification/mine', (req, res) => {
 
             Notification.count({
                 $or: [
-                  { 'user': user },
-                  { 'broadcast': true }
+                    { 'user': user },
+                    { 'broadcast': true }
                 ],
-                $and:[
-                    {'status':true}
+                $and: [
+                    { 'status': true }
                 ]
-              }, (e, conteo) => {
+            }, (e, conteo) => {
+                res.json({
+                    ok: true,
+                    records: conteo,
+                    data: notifications
+                })
+            })
+
+        })
+});
+
+//buscar noificaciones con el titulo o texto que incluya el termino enviado
+//queryParams: searchTerm
+app.get('/notification/search', (req, res) => {
+
+    let searchTerm = req.query.searchTerm;
+
+    let regexp = new RegExp(searchTerm, 'i')
+
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let limite = req.query.limite || 20;
+    limite = Number(limite);
+
+    Notification.find({
+            $or: [
+                { 'title': regexp },
+                { 'text': regexp }
+            ]
+        })
+        .skip(desde)
+        .limit(limite)
+        .exec((error, notifications) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    errorCode: 500,
+                    error
+                })
+            }
+
+            Notification.count({
+                $or: [
+                    { 'title': regexp },
+                    { 'text': regexp }
+                ]
+            }, (e, conteo) => {
                 res.json({
                     ok: true,
                     records: conteo,
@@ -138,12 +189,12 @@ app.get('/notification/mine', (req, res) => {
 app.post('/notification', (req, res) => {
     let body = req.body;
 
-   let notification = new Notification({
+    let notification = new Notification({
         title: body.title,
         type: body.type,
         text: body.text,
         userTo: body.userTo,
-        broadcast: body.broadcast,        
+        broadcast: body.broadcast,
         creationDate: new Date()
     });
 
@@ -155,7 +206,7 @@ app.post('/notification', (req, res) => {
                 errorCode: 500,
                 error
             })
-        }      
+        }
 
         res.json({
             ok: true,
