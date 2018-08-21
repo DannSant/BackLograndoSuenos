@@ -14,7 +14,7 @@ app.get('/notification', (req, res) => {
     let id = req.query.id;
 
 
-    Associate.findOne({ _id: id })
+    Notification.findOne({ _id: id })
         .exec((error, notification) => {
             if (error) {
                 return res.status(500).json({
@@ -45,7 +45,7 @@ app.get('/notification/all', (req, res) => {
     }
 
     if (req.query.user) {
-        filter.user = req.query.user;
+        filter.userTo = req.query.user;
     }
 
     if (req.query.broadcast) {
@@ -57,6 +57,8 @@ app.get('/notification/all', (req, res) => {
 
     let limite = req.query.limite || 20;
     limite = Number(limite);
+
+    console.log(filter);
 
     Notification.find(filter)
         .skip(desde)

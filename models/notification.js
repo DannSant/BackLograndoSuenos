@@ -10,11 +10,11 @@ let types = {
 
 var notificationSchema = new Schema({
     title: { type: String, required: [true, "El titulo es necesario"] },
-    type: { type: String,default:'T',enum:types },
-    text: { type: String, required: [true, "El texto es necesario"] },    
-    userTo: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    type: { type: String, default: 'T', enum: types },
+    text: { type: String, required: [true, "El texto es necesario"] },
+    userTo: { type: Schema.Types.ObjectId, ref: 'User', required: false },
     broadcast: { type: Boolean, default: true },
-    creationDate:{type:Date},
+    creationDate: { type: Date },
     status: { type: Boolean, default: true }
 });
 
