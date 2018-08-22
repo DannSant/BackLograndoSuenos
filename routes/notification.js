@@ -15,6 +15,7 @@ app.get('/notification', (req, res) => {
 
 
     Notification.findOne({ _id: id })
+        .populate("userTo")
         .exec((error, notification) => {
             if (error) {
                 return res.status(500).json({
