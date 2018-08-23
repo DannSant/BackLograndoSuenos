@@ -13,7 +13,7 @@ app.post('/login', (req, res) => {
     let body = req.body;
 
 
-    console.log(body);
+    
     Usuario.findOne({ email: body.email }, (error, usuarioDB) => {
         if (error) {
             return res.status(500).json({

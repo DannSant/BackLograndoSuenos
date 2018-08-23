@@ -110,6 +110,7 @@ app.get('/notification/mine', (req, res) => {
         })
         .skip(desde)
         .limit(limite)
+        .sort({creationDate: 'desc'})
         .exec((error, notifications) => {
             if (error) {
                 return res.status(500).json({
@@ -244,6 +245,42 @@ app.post('/notification/delete/:id', function(req, res) {
                 errorCode: 400,
                 error: {
                     message: "No se encontró la notificacion a borrar"
+                }
+            })
+        }
+
+        res.json({
+            ok: true,
+            data: notificationDB
+        });
+
+    });
+});
+
+//Cambia el estatus de una notificacion a true
+app.post('/notification/enable/:id', function(req, res) {
+    let id = req.params.id;
+
+    let body = _.pick(req.body, ['status']);
+
+    body.status = true
+
+
+    Notification.findByIdAndUpdate(id, body, { new: true }, (error, notificationDB) => {
+        if (error) {
+            return res.status(500).json({
+                ok: false,
+                errorCode: 500,
+                error
+            })
+        }
+
+        if (!notificationDB) {
+            return res.status(400).json({
+                ok: false,
+                errorCode: 400,
+                error: {
+                    message: "No se encontró la notificacion a habilitar"
                 }
             })
         }

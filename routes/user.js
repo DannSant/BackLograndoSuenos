@@ -5,8 +5,21 @@ const app = express();
 const User = require('../models/user');
 const Associate = require('../models/associate');
 const { verificaToken, verificaAdmin } = require('../middlewares/auth')
+const jwt = require('jsonwebtoken')
 
+//=============================
+//Renovacion de token
+//==============================
+app.get("/renewToken",verificaToken, (req,res)=>{
+    let token = jwt.sign({
+        usuario:  req.usuario
+    }, process.env.SEED, { expiresIn: process.env.CADUCIDAD_TOKEN });
 
+    res.json({
+        ok: true,
+        token
+    })
+})
 
 //=======================
 // PETICIONES GET
