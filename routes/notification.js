@@ -59,7 +59,7 @@ app.get('/notification/all', (req, res) => {
     let limite = req.query.limite || 20;
     limite = Number(limite);
 
-    console.log(filter);
+
 
     Notification.find(filter)
         .skip(desde)
