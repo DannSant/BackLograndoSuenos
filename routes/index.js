@@ -13,6 +13,7 @@ app.use(require('./baucher'));
 app.use(require('./email'));
 app.use(require('./notification'));
 app.use(require('./upload-file'));
+app.use(require('./load-data'));
 
 
 
