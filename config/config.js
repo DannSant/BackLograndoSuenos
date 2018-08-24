@@ -11,18 +11,18 @@ process.env.PORT = process.env.PORT || 3000;
 //=============================
 //Link para afiliados
 //============================
-if(process.env.NODE_ENV=="dev"){
-    process.env.ASSOCIATE_LINK="http://localhost:4200/register"
-}else {
-    process.env.ASSOCIATE_LINK="http://lograndosuenos7/register"
+if (process.env.NODE_ENV == "dev") {
+    process.env.ASSOCIATE_LINK = "http://localhost:4200/register"
+} else {
+    process.env.ASSOCIATE_LINK = "http://lograndosuenos7/register"
 }
 
 
 //===============
 // JWT
 //==============
-process.env.CADUCIDAD_TOKEN = 60 * 60 * 24 * 30;
-process.env.SEED = "este-es-el-seed-de-desarrollo";
+process.env.CADUCIDAD_TOKEN = 60 * 60 * 24 * 30 * 2;
+process.env.SEED = process.env.SEED || 'este-es-el-seed-de-desarrollo';
 
 //===============
 // DB
