@@ -142,7 +142,7 @@ function createHtmlBody(userEmail, userName, userUserName, userPassword) {
         </tr>
     </table>
 
-    <p>No olvides tambien descargar la aplicacion de Thunderbird en http://pajaritodetrueno.com </p>
+    <p>No olvides tambien descargar la aplicacion de Thunderbird en https://www.thunderbird.net/es-ES/ </p>
 
     Gracias!!
     `;
