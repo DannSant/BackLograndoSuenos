@@ -15,6 +15,8 @@ app.get('/associate', (req, res) => {
 
 
     Associate.findOne({ _id: id })
+        .populate('bank')
+        .populate('state')
         .exec((error, associate) => {
             if (error) {
                 return res.status(500).json({
@@ -108,7 +110,7 @@ app.post('/associate', (req, res) => {
 
     let hasPayment = ((body.payAmmount) ? true : false);
 
-   
+
 
     let associate = new Associate({
         name: body.name,
@@ -150,7 +152,7 @@ app.post('/associate', (req, res) => {
 
 });
 
-app.post('/associate/delete/:id', function(req, res) {
+app.post('/associate/delete/:id', [verificaToken, verificaAdmin], function(req, res) {
     let id = req.params.id;
 
     let body = _.pick(req.body, ['status']);
@@ -218,7 +220,7 @@ app.post('/associate/resetId', (req, res) => {
 //=======================
 // PETICIONES PUT
 //=======================
-app.put('/associate/:id', function(req, res) {
+app.put('/associate/:id', [verificaToken, verificaAdmin], function(req, res) {
     let code = req.params.id;
     let body = _.pick(req.body, ['name', 'personalEmail', 'cellphone', 'bank', 'account', 'clabe', 'card', 'curp', 'rfc', 'address', 'birthDate', 'hasPayment', 'payAmmount']);
     //console.log(req.body);

@@ -15,17 +15,18 @@ let stateCatalog;
  */
 app.post('/loadData', async(req, res) => {
 
-    Bank.find({},(error,banks)=>{
-      
+    Bank.find({}, (error, banks) => {
+
         bankCatalog = banks;
-        State.find({},(error,states)=>{
-            stateCatalog=states;            
+        State.find({}, (error, states) => {
+            stateCatalog = states;
             var csv = require("fast-csv");
             csv
                 .fromPath("db.csv")
-                .on("data", async(data)=> {
-                let newAssociate = await createAssociate(data);
-                //onsole.log(newAssociate)
+                .on("data", async(data) => {
+                    let newAssociate = await createAssociate(data);
+
+                    //onsole.log(newAssociate)
                 })
                 .on("end", function() {
                     console.log("done");
@@ -34,7 +35,7 @@ app.post('/loadData', async(req, res) => {
         });
     });
 
-    
+
 
 
 });
@@ -42,35 +43,35 @@ app.post('/loadData', async(req, res) => {
 let createAssociate = async(data) => {
 
 
-    let name=replaceSpecialChars(data[1],false);
-    let payAmmount =data[2];
-    let bank=replaceSpecialChars(data[3]);
-    let account=replaceSpecialChars(data[4]);
-    let clabe=replaceSpecialChars(data[5]);
-    let card=replaceSpecialChars(data[6]);
+    let name = replaceSpecialChars(data[1], false);
+    let payAmmount = data[2];
+    let bank = replaceSpecialChars(data[3]);
+    let account = replaceSpecialChars(data[4]);
+    let clabe = replaceSpecialChars(data[5]);
+    let card = replaceSpecialChars(data[6]);
 
     let dateArray = data[7].split(" ");
     let day = dateArray[0];
     let month = dateArray[1];
-    month = month-1;
+    month = month - 1;
     let year = dateArray[2];
     let birthDate
-    if(day=='' || year>2018){
-        birthDate= new Date();
-    }else {
-        birthDate=new Date(year , month, day); 
-    }  
+    if (day == '' || year > 2018) {
+        birthDate = new Date();
+    } else {
+        birthDate = new Date(year, month, day);
+    }
 
-    let curp=replaceSpecialChars(data[8]);
-    let rfc=replaceSpecialChars(data[9]);
-    let movil=replaceSpecialChars(data[10]);
-    let address=replaceSpecialChars(data[11],false);
-    let state=replaceSpecialChars(data[12],false);
+    let curp = replaceSpecialChars(data[8]);
+    let rfc = replaceSpecialChars(data[9]);
+    let movil = replaceSpecialChars(data[10]);
+    let address = replaceSpecialChars(data[11], false);
+    let state = replaceSpecialChars(data[12], false);
 
     let bankId = findBankId(bank);
     let stateId = findStateId(state)
-    
-    
+
+
 
     // console.log("numero",data[0])
     // console.log("name",name)
@@ -84,12 +85,12 @@ let createAssociate = async(data) => {
     // console.log("rfc",rfc)
     // console.log("movil",movil)
     // console.log(" ")
-    
+
     //return "nuevo!" + data[0];
 
-    
 
-    let hasPayment = ((payAmmount || payAmmount>0) ? true : false);
+
+    let hasPayment = ((payAmmount || payAmmount > 0) ? true : false);
 
 
 
@@ -110,61 +111,85 @@ let createAssociate = async(data) => {
         state: stateId,
         paymentDate: null,
         paymentNumber: 0,
-        creationDate: new Date()
+        creationDate: new Date(),
+        id: data[0]
     });
     let newAssociate;
     try {
         newAssociate = await associate.save();
-        console.log("numero",data[0])
-        console.log(newAssociate);
-    }catch(error){
+        if (!newAssociate) {
+            console.log(associate);
+        }
+    } catch (error) {
         console.log("Error al salvar el afiliado" + data[0]);
         console.log(error);
-    }finally{
-        return (newAssociate)?newAssociate:null;
+    } finally {
+        return (newAssociate) ? newAssociate : null;
     }
 }
 
-let replaceSpecialChars = (value,replaceSpaces=true)=>{
-    if(typeof value !="string"){
+let replaceSpecialChars = (value, replaceSpaces = true) => {
+    if (typeof value != "string") {
         return value;
     }
     value = value.trim();
-    if(replaceSpaces){
-        value = value.replace(/ /g,"");
-    }   
-    value = value.replace(/\r?\n|\r/g,"");
-    value = value.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g,"");
+    if (replaceSpaces) {
+        value = value.replace(/ /g, "");
+    }
+    value = value.replace(/\r?\n|\r/g, "");
+    value = value.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, "");
 
-    if(value==null || value==undefined || value==''){
+    if (value == null || value == undefined || value == '') {
         return 'nodata'
     }
 
     return value;
 }
 
-let findBankId = (bankDesc)=>{
+let findBankId = (bankDesc) => {
     let id;
-    for (let bank of bankCatalog){
-        if(bank.name.toLowerCase()==bankDesc.toLowerCase()){
-            id=bank._id;
+    for (let bank of bankCatalog) {
+        if (bank.name.toLowerCase() == bankDesc.toLowerCase()) {
+            id = bank._id;
             break;
         }
     }
-    
-    return id?id:"5b758dad89185b24a8685953";
+
+    return id ? id : "5b5946f504fec32c0cc356e9";
 }
 
-let findStateId = (stateDesc)=>{
+let findStateId = (stateDesc) => {
     let id;
-    for (let state of stateCatalog){
-        if(state.name.toLowerCase()==stateDesc.toLowerCase()){
-            id=state._id;
+    for (let state of stateCatalog) {
+        if (state.name.toLowerCase() == stateDesc.toLowerCase()) {
+            id = state._id;
             break;
         }
     }
-    return id?id:"5b7711b1a3e1b480a1b17083";
+    return id ? id : "5b779b882b34906d404d21cc";
 }
+
+app.get('/getMissingData', (req, res) => {
+    let arreglo = [];
+    for (let i = 0; i < 150; i++) {
+        arreglo.push(i + 1);
+    }
+
+    let missing = [];
+    Associate.find({})
+        .sort({ id: 1 })
+        .exec((error, associates) => {
+            let index = 0;
+            for (let associate of associates) {
+                console.log(associate.id + "--" + arreglo[index]);
+                if (associate.id != arreglo[index]) {
+                    missing.push(arreglo[index]);
+                }
+                index++;
+            }
+            res.json({ ok: true, data: missing })
+        })
+});
 
 //=======================
 // Exportar rutas
