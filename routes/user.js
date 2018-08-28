@@ -88,8 +88,7 @@ app.post('/user', [verificaToken, verificaAdmin], (req, res) => {
     let body = req.body;
     let associateId = body.associate._id
     let usuario = new User({
-        name: body.name,
-        email: body.email,
+        name: body.name,       
         username: body.username,
         password: bcrypt.hashSync(body.password, 10),
         role: body.role,

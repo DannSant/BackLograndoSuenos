@@ -9,12 +9,11 @@ let rolesValidos = {
 };
 
 var userSchema = new Schema({
-    name: { type: String, required: [true, "El nombre es necesario"] },
-    email: { type: String, unique: true, required: [true, "El email es necesario"] },
+    name: { type: String, required: [true, "El nombre es necesario"] }, 
+    lastname: { type: String, required: [true, "El apellido es necesario"] },   
     username: { type: String, required: [true, "El usuario es necesario"] },
     password: { type: String, required: [true, "El password es necesario"] },
-    role: { type: String, required: true, default: "USER_ROLE", enum: rolesValidos },
-    associate: { type: Schema.Types.ObjectId, ref: 'Associate', required: true },
+    role: { type: String, required: true, default: "USER_ROLE", enum: rolesValidos },   
     status: { type: Boolean, default: true }
 });
 

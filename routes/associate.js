@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const _ = require('underscore');
 const app = express();
 const Associate = require('../models/associate')
+const User = require('../models/user')
 const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 
 //=======================
@@ -105,15 +106,16 @@ app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
 //=======================
 // PETICIONES POST
 //=======================
-app.post('/associate', (req, res) => {
+//Este metodo va a crear un afiliado, y despues crea un usuario usando el numero de registro(id) que
+//va a refresar el afiliado, luego el afiliado será ligado al usuario mediante el campo de user
+app.post('/associate/register', (req, res) => {
     let body = req.body;
 
     let hasPayment = ((body.payAmmount) ? true : false);
-
-
-
+    //PASO 1 - Generamos objeto del afiliado
     let associate = new Associate({
         name: body.name,
+        lastname: body.lastname,
         personalEmail: body.personalEmail,
         cellphone: body.cellphone,
         bank: body.bank,
@@ -132,22 +134,62 @@ app.post('/associate', (req, res) => {
         creationDate: new Date()
     });
 
+    //PASO 2 - Guardamos el objeto en la BD
     associate.save((error, associateDB) => {
 
         if (error) {
             return res.status(500).json({
                 ok: false,
                 errorCode: 500,
-                error
+                error,
+                msg:"Error al crear el afiliado"
             })
         }
-        //usuarioDB.password = null;
-
-        res.json({
-            ok: true,
-            data: associateDB
+       
+        //PASO 3 - Si todo sale bien, generamos el objeto del Usuario
+        let username = body.name.substring(0,1).toUpperCase() + body.lastname.substring(0,1).toUpperCase() + associateDB.id + body.cellphone.substring(body.cellphone.length - 1,1);
+        let user = new User({
+            name:body.name,
+            lastname:body.lastname,
+            username:username,
+            password:"lograndosuenos7"
         })
 
+        //PASO 4 - Guardamos el objeto en la BD
+        user.save((errorUSer,userDB)=>{
+            if (errorUSer) {
+                return res.status(500).json({
+                    ok: false,
+                    errorCode: 500,
+                    error,
+                    msg:"Error al crear el usuario"
+                })
+            }
+
+            //PASO 5 - Si todo sale bien ligamos el id del usuario con el afiliado recien creado
+            associateDB.user = userDB._id;
+
+            //PASO 6 - Guardamos el cambio mencionado en el paso 5 en la BD
+            associateDB.save((errorLink,associateLinked)=>{
+                if (errorLink) {
+                    return res.status(500).json({
+                        ok: false,
+                        errorCode: 500,
+                        error,
+                        msg:"Error al ligar el usuario y afiliado"
+                    })
+                }    
+                
+                //Si todo sale bien, regresamos la respuesta
+                res.json({
+                    ok: true,
+                    data: {
+                        associate: associateLinked,
+                        user: userDB
+                    }
+                })
+            })
+        })
     });
 
 });
