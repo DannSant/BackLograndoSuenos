@@ -112,13 +112,17 @@ app.post('/associate/register', (req, res) => {
     let body = req.body;
 
     let hasPayment = ((body.payAmmount) ? true : false);
+    let bank = body.bank._id == "0" ? null : body.bank;
+    let state = body.state._id == "0" ? null : body.state;
+    console.log(bank);
+    console.log(state);
     //PASO 1 - Generamos objeto del afiliado
     let associate = new Associate({
         name: body.name,
         lastname: body.lastname,
         personalEmail: body.personalEmail,
         cellphone: body.cellphone,
-        bank: body.bank,
+        bank: bank,
         account: body.account,
         clabe: body.clabe,
         card: body.card,
@@ -128,7 +132,7 @@ app.post('/associate/register', (req, res) => {
         birthDate: body.birthDate,
         hasPayment: hasPayment,
         payAmmount: body.payAmmount,
-        state: body.state,
+        state: state,
         paymentDate: body.paymentDate,
         paymentNumber: body.paymentNumber,
         creationDate: new Date()
@@ -142,27 +146,30 @@ app.post('/associate/register', (req, res) => {
                 ok: false,
                 errorCode: 500,
                 error,
-                msg:"Error al crear el afiliado"
+                msg: "Error al crear el afiliado"
             })
         }
-       
+
         //PASO 3 - Si todo sale bien, generamos el objeto del Usuario
-        let username = body.name.substring(0,1).toUpperCase() + body.lastname.substring(0,1).toUpperCase() + associateDB.id + body.cellphone.substring(body.cellphone.length - 1,1);
+        //console.log(body.cellphone.substring(body.cellphone.length - 2, body.cellphone.length));
+        let username = body.name.substring(0, 1).toUpperCase() + body.lastname.substring(0, 1).toUpperCase() + associateDB.id + body.cellphone.substring(body.cellphone.length - 2, body.cellphone.length);
         let user = new User({
-            name:body.name,
-            lastname:body.lastname,
-            username:username,
-            password:"lograndosuenos7"
+            name: body.name,
+            lastname: body.lastname,
+            username: username,
+            password: "lograndosuenos7"
         })
 
+        console.log(user);
+
         //PASO 4 - Guardamos el objeto en la BD
-        user.save((errorUSer,userDB)=>{
+        user.save((errorUSer, userDB) => {
             if (errorUSer) {
                 return res.status(500).json({
                     ok: false,
                     errorCode: 500,
-                    error,
-                    msg:"Error al crear el usuario"
+                    error: errorUSer,
+                    msg: "Error al crear el usuario"
                 })
             }
 
@@ -170,16 +177,16 @@ app.post('/associate/register', (req, res) => {
             associateDB.user = userDB._id;
 
             //PASO 6 - Guardamos el cambio mencionado en el paso 5 en la BD
-            associateDB.save((errorLink,associateLinked)=>{
+            associateDB.save((errorLink, associateLinked) => {
                 if (errorLink) {
                     return res.status(500).json({
                         ok: false,
                         errorCode: 500,
-                        error,
-                        msg:"Error al ligar el usuario y afiliado"
+                        error: errorLink,
+                        msg: "Error al ligar el usuario y afiliado"
                     })
-                }    
-                
+                }
+
                 //Si todo sale bien, regresamos la respuesta
                 res.json({
                     ok: true,
