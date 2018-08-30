@@ -85,7 +85,7 @@ app.post('/register', (req, res) => {
                 name: sentUser.name,
                 lastname: sentUser.lastname,
                 username: username,
-                password: "lograndosuenos7"
+                password: bcrypt.hashSync("lograndosuenos7", 10),
             });
 
 

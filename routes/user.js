@@ -83,6 +83,30 @@ app.get('/user/all', [verificaToken, verificaAdmin], (req, res) => {
 // PETICIONES POST
 //=======================
 
+app.post('/user/admin',  (req, res) => {
+    let body = req.body;
+    let usuario = new User({
+        name: body.name, 
+        lastname: body.lastname,            
+        username: body.username,
+        password: bcrypt.hashSync(body.password, 10),
+        role: 'ADMIN_ROLE'
+    });
+    usuario.save((error,usuarioDB)=>{
+        if (error) {
+            return res.status(409).json({
+                ok: false,
+                error,
+                errorMsg: "Error al crear usuario"
+            })
+        }
+        res.json({
+            ok: true,
+            data: usuarioDB
+        });
+    })
+});
+
 //Crea un usuario y lo vincula con el associate_id recibido dentro del mismo objeto usuario
 app.post('/user', [verificaToken, verificaAdmin], (req, res) => {
     let body = req.body;

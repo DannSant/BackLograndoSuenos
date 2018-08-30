@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const _ = require('underscore');
 const app = express();
-const Associate = require('../models/associate')
+const Position = require('../models/position')
 const { verificaToken, verificaAdmin } = require('../middlewares/auth');
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
@@ -72,15 +72,15 @@ app.put('/baucher/:id', function(req, res) {
             });
 
         //imagen cargada 
-        imagenAfiliados(id, res, nombreArchivoGuardar);
+        imagenPosition(id, res, nombreArchivoGuardar);
 
 
     });;
 
 });
 
-function imagenAfiliados(id, res, nombreArchivo) {
-    Associate.findById(id, (error, associateDB) => {
+function imagenPosition(id, res, nombreArchivo) {
+    Position.findById(id, (error, positionDB) => {
         if (error) {
             borrarArchivo(nombreArchivo)
             return res.status(500).json({
@@ -89,29 +89,29 @@ function imagenAfiliados(id, res, nombreArchivo) {
             })
         }
 
-        if (!associateDB) {
+        if (!positionDB) {
             borrarArchivo(nombreArchivo)
             return res.status(400).json({
                 ok: false,
                 error: {
-                    message: "Afiliado no encontrado"
+                    message: "Posicion no encontrado"
                 }
             })
         }
-        borrarArchivo(associateDB.paymentBaucher)
+        borrarArchivo(positionDB.paymentBaucher)
 
-        associateDB.paymentBaucher = nombreArchivo;
+        positionDB.paymentBaucher = nombreArchivo;
 
-        associateDB.save((error, asociadoGuardado) => {
-            if (error) {
+        positionDB.save((errorSave, positionSaved) => {
+            if (errorSave) {
                 return res.status(500).json({
                     ok: false,
-                    error
+                    error:errorSave
                 })
             }
             res.json({
                 ok: true,
-                data: asociadoGuardado,
+                data: positionSaved,
                 img: nombreArchivo,
                 message: "Archivo cargado"
             });
