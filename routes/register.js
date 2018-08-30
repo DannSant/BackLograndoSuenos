@@ -21,13 +21,17 @@ app.post('/register', (req, res) => {
 
     let sentAssociate = body.associate;
     let sentPosition = body.position;
-    let sentUser = body.position
+    let sentUser = body.user
+
+    console.log(sentAssociate);
+    console.log(sentPosition);
+    console.log(sentUser);
 
     //PASO 1 - Generamos objeto del afiliado   
     let bank = sentAssociate.bank._id == "0" ? null : sentAssociate.bank;
     let state = sentAssociate.state._id == "0" ? null : sentAssociate.state;
 
-    let associate = new Associate({        
+    let associate = new Associate({
         personalEmail: sentAssociate.personalEmail,
         cellphone: sentAssociate.cellphone,
         bank: bank,
@@ -37,8 +41,8 @@ app.post('/register', (req, res) => {
         curp: sentAssociate.curp,
         rfc: sentAssociate.rfc,
         address: sentAssociate.address,
-        birthDate: sentAssociate.birthDate,       
-        state: state,        
+        birthDate: sentAssociate.birthDate,
+        state: state,
         creationDate: new Date()
     });
 
@@ -54,29 +58,29 @@ app.post('/register', (req, res) => {
             })
         }
 
-       
+
 
         let position = new Position({
-            associate:associateDB._id,
+            associate: associateDB._id,
             payAmmount: sentPosition.payAmmount,
             paymentDate: sentPosition.paymentDate,
             paymentNumber: sentPosition.paymentNumber
         });
 
-         //PASO 4 - Guardamos la posicion en la base de datos
-        position.save( (errorPosition, positionDB)=>{
+        //PASO 4 - Guardamos la posicion en la base de datos
+        position.save((errorPosition, positionDB) => {
 
             if (errorPosition) {
                 return res.status(500).json({
                     ok: false,
                     errorCode: 500,
-                    error:errorPosition,
+                    error: errorPosition,
                     msg: "Error al crear la posicion"
                 })
             }
 
             //PASO 5 - Si no hay error generamos el objeto de usuario, usando los datos de la posicion y afiliado
-            let username = sentUser.name.substring(0, 1).toUpperCase() + sentUser.lastname.substring(0, 1).toUpperCase() + positionDB.position_number + body.cellphone.substring(sentAssociate.cellphone.length - 2, sentAssociate.cellphone.length);
+            let username = sentUser.name.substring(0, 1).toUpperCase() + sentUser.lastname.substring(0, 1).toUpperCase() + positionDB.position_number + sentAssociate.cellphone.substring(sentAssociate.cellphone.length - 2, sentAssociate.cellphone.length);
             let user = new User({
                 name: sentUser.name,
                 lastname: sentUser.lastname,
@@ -84,7 +88,7 @@ app.post('/register', (req, res) => {
                 password: "lograndosuenos7"
             });
 
-            
+
             //PASO 6 - Guardamos el objeto usuario de en la BD
             user.save((errorUSer, userDB) => {
                 if (errorUSer) {
@@ -122,11 +126,16 @@ app.post('/register', (req, res) => {
                 })
             })
         });
-        
-        
 
-    
+
+
+
 
     });
 
 });
+
+//=======================
+// Exportar rutas
+//=======================
+module.exports = app;

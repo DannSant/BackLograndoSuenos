@@ -5,6 +5,7 @@ const app = express()
 // Rutas
 //=======================
 app.use(require('./login'));
+app.use(require('./register'));
 app.use(require('./user'));
 app.use(require('./bank'));
 app.use(require('./associate'));
