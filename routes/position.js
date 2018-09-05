@@ -11,7 +11,7 @@ const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 //=======================
 
 //regresa los asociados que tengan nuevas posiciones (que no tengan email)
-app.get('/positions/new', [verificaToken, verificaAdmin], (req, res) => {
+app.get('/position/new', [verificaToken, verificaAdmin], (req, res) => {
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -22,9 +22,9 @@ app.get('/positions/new', [verificaToken, verificaAdmin], (req, res) => {
     Position.find({ email: null })
         .skip(desde)
         .limit(limite)
-        .populate({path:'associate',populate:{path:'user'}})       
+        .populate({ path: 'associate', populate: { path: 'user' } })
         .exec((error, positions) => {
-            
+
             if (error) {
                 return res.status(500).json({
                     ok: false,
@@ -49,9 +49,9 @@ app.get('/position', (req, res) => {
 
     let id = req.query.id;
 
-    
+
     Position.findOne({ _id: id })
-        .populate({path:'associate',populate:{path:'user'}})   
+        .populate({ path: 'associate', populate: { path: 'user' } })
         .exec((error, position) => {
             if (error) {
                 return res.status(500).json({
@@ -71,6 +71,34 @@ app.get('/position', (req, res) => {
         })
 });
 
+app.get('/position/all', (req, res) => {
+
+    let id = req.query.id;
+
+
+    Position.find({ status: true })
+        .populate({ path: 'associate', populate: { path: 'user' } })
+        .exec((error, positions) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    errorCode: 500,
+                    error
+                })
+            }
+
+            Position.count({ status: true }, (e, conteo) => {
+                res.json({
+                    ok: true,
+                    records: conteo,
+                    data: positions
+                })
+            })
+
+
+        })
+});
+
 
 //=======================
 // PETICIONES PUT
@@ -81,7 +109,7 @@ app.put('/position/addEmail/:id', (req, res) => {
 
     body = _.pick(req.body, ['email']);
 
-    Position.findById(code,(error,position)=>{
+    Position.findById(code, (error, position) => {
         if (error) {
             return res.status(500).json({
                 ok: false,
@@ -92,12 +120,12 @@ app.put('/position/addEmail/:id', (req, res) => {
 
         position.email = body.email;
 
-        position.save((errorSave,savedPosition)=>{
+        position.save((errorSave, savedPosition) => {
             if (errorSave) {
                 return res.status(500).json({
                     ok: false,
                     errorCode: 500,
-                    error:errorSave
+                    error: errorSave
                 })
             }
 
@@ -108,7 +136,7 @@ app.put('/position/addEmail/:id', (req, res) => {
         })
 
     })
-   
+
 });
 
 //=======================

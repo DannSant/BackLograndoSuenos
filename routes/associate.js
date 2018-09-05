@@ -18,6 +18,7 @@ app.get('/associate', (req, res) => {
     Associate.findOne({ _id: id })
         .populate('bank')
         .populate('state')
+        .populate('user')
         .exec((error, associate) => {
             if (error) {
                 return res.status(500).json({
@@ -51,6 +52,7 @@ app.get('/associate/all', (req, res) => {
         .limit(limite)
         .populate('bank')
         .populate('state')
+        .populate('user')
         .exec((error, associates) => {
             if (error) {
                 return res.status(500).json({
@@ -176,10 +178,18 @@ app.post('/associate/resetId', (req, res) => {
 //=======================
 // PETICIONES PUT
 //=======================
-app.put('/associate/:id', [verificaToken, verificaAdmin], function(req, res) {
+app.put('/associate/:id', [verificaToken], function(req, res) {
     let code = req.params.id;
-    let body = _.pick(req.body, ['name', 'personalEmail', 'cellphone', 'bank', 'account', 'clabe', 'card', 'curp', 'rfc', 'address', 'birthDate', 'hasPayment', 'payAmmount']);
+    let body = _.pick(req.body, ['personalEmail', 'cellphone', 'bank', 'account', 'clabe', 'card', 'curp', 'rfc', 'address', 'state', 'birthDate']);
     //console.log(req.body);
+
+
+
+    let bank = body.bank._id == "0" ? null : body.bank;
+    let state = body.state._id == "0" ? null : body.state;
+
+    body.bank = bank
+    body.state = state
 
     Associate.findByIdAndUpdate(code, body, { new: true, runValidators: true }, (error, associateDB) => {
         if (error) {

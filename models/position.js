@@ -10,6 +10,7 @@ var positionSchema = new Schema({
     paymentDate: { type: Date, required: [true, "Fecha de pago es necesario"] },
     paymentNumber: { type: String, required: [true, "Folio de pago es necesario"] },
     paymentBaucher: { type: String },
+    isFirst: { type: Boolean, default: false },
     associate: { type: Schema.Types.ObjectId, ref: 'Associate', required: true },
     status: { type: Boolean, default: true }
 });

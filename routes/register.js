@@ -64,7 +64,8 @@ app.post('/register', (req, res) => {
             associate: associateDB._id,
             payAmmount: sentPosition.payAmmount,
             paymentDate: sentPosition.paymentDate,
-            paymentNumber: sentPosition.paymentNumber
+            paymentNumber: sentPosition.paymentNumber,
+            isFirst: true
         });
 
         //PASO 4 - Guardamos la posicion en la base de datos

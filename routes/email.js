@@ -19,7 +19,7 @@ app.post('/email/welcome', (req, res) => {
     if (!userEmail) {
         return res.status(409).json({
             ok: false,
-            error,
+            error: { message: "Falta el campo de userEmail" },
             errorMsg: "Falta el campo de userEmail"
         })
     }
@@ -28,7 +28,7 @@ app.post('/email/welcome', (req, res) => {
     if (!personalEmail) {
         return res.status(409).json({
             ok: false,
-            error,
+            error: { message: "Falta el campo de userEmail" },
             errorMsg: "Falta el campo de personalEmail"
         })
     }
@@ -37,7 +37,7 @@ app.post('/email/welcome', (req, res) => {
     if (!userName) {
         return res.status(409).json({
             ok: false,
-            error,
+            error: { message: "Falta el campo de userEmail" },
             errorMsg: "Falta el campo de userName"
         })
     }
@@ -46,7 +46,7 @@ app.post('/email/welcome', (req, res) => {
     if (!userUserName) {
         return res.status(409).json({
             ok: false,
-            error,
+            error: { message: "Falta el campo de userEmail" },
             errorMsg: "Falta el campo de userUserName"
         })
     }
@@ -54,7 +54,7 @@ app.post('/email/welcome', (req, res) => {
     if (!userPassword) {
         return res.status(409).json({
             ok: false,
-            error,
+            error: { message: "Falta el campo de userEmail" },
             errorMsg: "Falta el campo de userPassword"
         })
     }

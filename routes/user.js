@@ -10,9 +10,9 @@ const jwt = require('jsonwebtoken')
 //=============================
 //Renovacion de token
 //==============================
-app.get("/renewToken",verificaToken, (req,res)=>{
+app.get("/renewToken", verificaToken, (req, res) => {
     let token = jwt.sign({
-        usuario:  req.usuario
+        usuario: req.usuario
     }, process.env.SEED, { expiresIn: process.env.CADUCIDAD_TOKEN });
 
     res.json({
@@ -24,7 +24,7 @@ app.get("/renewToken",verificaToken, (req,res)=>{
 //=======================
 // PETICIONES GET
 //=======================
-app.get('/user', [verificaToken, verificaAdmin], (req, res) => {
+app.get('/user', [verificaToken], (req, res) => {
 
     let id = req.query.id;
 
@@ -83,16 +83,16 @@ app.get('/user/all', [verificaToken, verificaAdmin], (req, res) => {
 // PETICIONES POST
 //=======================
 
-app.post('/user/admin',  (req, res) => {
+app.post('/user/admin', (req, res) => {
     let body = req.body;
     let usuario = new User({
-        name: body.name, 
-        lastname: body.lastname,            
+        name: body.name,
+        lastname: body.lastname,
         username: body.username,
         password: bcrypt.hashSync(body.password, 10),
         role: 'ADMIN_ROLE'
     });
-    usuario.save((error,usuarioDB)=>{
+    usuario.save((error, usuarioDB) => {
         if (error) {
             return res.status(409).json({
                 ok: false,
@@ -112,7 +112,7 @@ app.post('/user', [verificaToken, verificaAdmin], (req, res) => {
     let body = req.body;
     let associateId = body.associate._id
     let usuario = new User({
-        name: body.name,       
+        name: body.name,
         username: body.username,
         password: bcrypt.hashSync(body.password, 10),
         role: body.role,
