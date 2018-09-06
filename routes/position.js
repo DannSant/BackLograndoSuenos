@@ -44,6 +44,38 @@ app.get('/position/new', [verificaToken, verificaAdmin], (req, res) => {
         })
 });
 
+//Regresa las posiciones del afiliado enviado
+app.get('/position/mine', [verificaToken], (req, res) => {
+
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let associateId = req.query.associateId;
+
+
+    Position.find({ associate: associateId })
+        .skip(desde)
+        .populate({ path: 'associate', populate: { path: 'user' } })
+        .exec((error, positions) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    errorCode: 500,
+                    error
+                })
+            }
+
+            Position.count({ associate: associateId }, (e, conteo) => {
+                res.json({
+                    ok: true,
+                    records: conteo,
+                    data: positions
+                })
+            })
+
+        })
+});
+
 //regresa una posicion por id
 app.get('/position', (req, res) => {
 

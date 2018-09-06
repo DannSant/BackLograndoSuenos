@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const _ = require('underscore');
 const app = express();
 const Usuario = require('../models/user')
+const Associate = require('../models/associate')
 const { verificaToken, verificaAdmin } = require('../middlewares/auth')
 
 
@@ -26,7 +27,7 @@ app.post('/login', (req, res) => {
             return res.status(400).json({
                 ok: false,
                 error: {
-                    message: "No se encontró al usuario"
+                    message: "Usuario o Contraseña incorrectos"
                 }
             })
         }
@@ -35,7 +36,7 @@ app.post('/login', (req, res) => {
             return res.status(400).json({
                 ok: false,
                 error: {
-                    message: "Contraseña incorrecta"
+                    message: "Usuario o Contraseña incorrectos"
                 }
             })
         }
@@ -44,11 +45,31 @@ app.post('/login', (req, res) => {
             usuario: usuarioDB
         }, process.env.SEED, { expiresIn: process.env.CADUCIDAD_TOKEN });
 
-        res.json({
-            ok: true,
-            data: usuarioDB,
-            token
-        })
+        Associate.findOne({ user: usuarioDB._id })
+            .exec((errorAssociate, associate) => {
+                if (errorAssociate) {
+                    return res.status(500).json({
+                        ok: false,
+                        error
+                    })
+                }
+                console.log(usuarioDB.role);
+                if (!associate && usuarioDB.role != "ADMIN_ROLE") {
+                    return res.status(400).json({
+                        ok: false,
+                        error: {
+                            message: "El afiliado aun no está registrado"
+                        }
+                    })
+                }
+                res.json({
+                    ok: true,
+                    data: { user: usuarioDB, associate: associate },
+                    token
+                })
+            })
+
+
 
 
     });
