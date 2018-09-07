@@ -23,9 +23,9 @@ app.post('/register', (req, res) => {
     let sentPosition = body.position;
     let sentUser = body.user
 
-    console.log(sentAssociate);
-    console.log(sentPosition);
-    console.log(sentUser);
+    //console.log(sentAssociate);
+    //console.log(sentPosition);
+    //console.log(sentUser);
 
     //PASO 1 - Generamos objeto del afiliado   
     let bank = sentAssociate.bank._id == "0" ? null : sentAssociate.bank;

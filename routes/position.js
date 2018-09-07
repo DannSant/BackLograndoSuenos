@@ -131,7 +131,37 @@ app.get('/position/all', (req, res) => {
         })
 });
 
+//=======================
+// PETICIONES POST
+//=======================
+app.post('/position/add/:id', (req, res) => {
+    let associateId = req.params.id;
 
+    let body = req.body;
+
+    let position = new Position({
+        associate: associateId,
+        payAmmount: body.payAmmount,
+        paymentDate: body.paymentDate,
+        paymentNumber: body.paymentNumber,
+        isFirst: false
+    });
+
+    position.save((error, savedPosition) => {
+        if (error) {
+            return res.status(500).json({
+                ok: false,
+                errorCode: 500,
+                error
+            })
+        }
+        res.json({
+            ok: true,
+            data: savedPosition
+        });
+
+    })
+});
 //=======================
 // PETICIONES PUT
 //=======================

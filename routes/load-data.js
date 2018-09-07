@@ -25,6 +25,7 @@ app.post('/loadData', async(req, res) => {
                 .fromPath("db.csv")
                 .on("data", async(data) => {
                     let newAssociate = await createAssociate(data);
+                    let
 
                     //onsole.log(newAssociate)
                 })
@@ -126,6 +127,18 @@ let createAssociate = async(data) => {
     } finally {
         return (newAssociate) ? newAssociate : null;
     }
+}
+
+let createPosition = async(data) => {
+
+}
+
+let createUser = async(data) => {
+
+}
+
+let linkAssociateUser = async(associate, userId) => {
+
 }
 
 let replaceSpecialChars = (value, replaceSpaces = true) => {
