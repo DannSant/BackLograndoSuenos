@@ -127,11 +127,7 @@ function createHtmlBody(userEmail, userName, userUserName, userPassword) {
     <p>Este correo es para notificarte que tu registro en Logrando Sueños 7 ha sido completado</p>
     <p>Puedes dirigirte al sitio http://lograndosuenos7.com/home e iniciar sesion con los siguientes datos</p>
 
-    <table>
-        <tr>
-            <td>Email:</td>
-            <td>${userEmail}</td>
-        </tr>
+    <table>       
         <tr>
             <td>Usuario:</td>
             <td>${userUserName}</td>
@@ -140,7 +136,14 @@ function createHtmlBody(userEmail, userName, userUserName, userPassword) {
             <td>Contraseña:</td>
             <td>${userPassword}</td>
         </tr>
+        <tr>
+            <td>Email:</td>
+            <td>${userEmail}</td>
+        </tr>
     </table>
+
+    <h3 style='color:darkred'> <u>😱¡Importante!😱 </u></h3>
+    <h3 style='color:darkred'> No cambiar contraseña de correo y usuario de mexicaos unidos </h3>
 
     <p>No olvides tambien descargar la aplicacion de Thunderbird en https://www.thunderbird.net/es-ES/ </p>
 

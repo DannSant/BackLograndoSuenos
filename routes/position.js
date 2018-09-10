@@ -76,6 +76,39 @@ app.get('/position/mine', [verificaToken], (req, res) => {
         })
 });
 
+
+//Regresa la primera posicion del afiliado
+app.get('/position/first', [verificaToken], (req, res) => {
+
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let associateId = req.query.associateId;
+
+
+    Position.findOne({ associate: associateId, isFirst: true })
+        .skip(desde)
+        .populate({ path: 'associate', populate: { path: 'user' } })
+        .exec((error, positions) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    errorCode: 500,
+                    error
+                })
+            }
+
+            Position.count({ associate: associateId, isFirst: true }, (e, conteo) => {
+                res.json({
+                    ok: true,
+                    records: conteo,
+                    data: positions
+                })
+            })
+
+        })
+});
+
 //regresa una posicion por id
 app.get('/position', (req, res) => {
 
@@ -169,7 +202,7 @@ app.put('/position/addEmail/:id', (req, res) => {
     let code = req.params.id;
     let body;
 
-    body = _.pick(req.body, ['email']);
+    body = _.pick(req.body, ['email', 'external_username', 'external_password']);
 
     Position.findById(code, (error, position) => {
         if (error) {
@@ -181,6 +214,8 @@ app.put('/position/addEmail/:id', (req, res) => {
         }
 
         position.email = body.email;
+        position.external_username = body.external_username;
+        position.external_password = body.external_password;
 
         position.save((errorSave, savedPosition) => {
             if (errorSave) {
