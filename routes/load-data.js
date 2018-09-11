@@ -25,9 +25,9 @@ app.post('/loadData', async(req, res) => {
                 .fromPath("db.csv")
                 .on("data", async(data) => {
                     let newAssociate = await createAssociate(data);
-                    let
-
-                    //onsole.log(newAssociate)
+                    let newPosition = await createPosition(data, newAssociate._id);
+                    let newUser = await createUser(data)
+                    let associateWithUser = await linkAssociateUser(newAssociate, newUser._id);
                 })
                 .on("end", function() {
                     console.log("done");
@@ -42,10 +42,6 @@ app.post('/loadData', async(req, res) => {
 });
 
 let createAssociate = async(data) => {
-
-
-    let name = replaceSpecialChars(data[1], false);
-    let payAmmount = data[2];
     let bank = replaceSpecialChars(data[3]);
     let account = replaceSpecialChars(data[4]);
     let clabe = replaceSpecialChars(data[5]);
@@ -87,16 +83,11 @@ let createAssociate = async(data) => {
     // console.log("movil",movil)
     // console.log(" ")
 
-    //return "nuevo!" + data[0];
-
-
-
-    let hasPayment = ((payAmmount || payAmmount > 0) ? true : false);
+    //return "nuevo!" + data[0]; 
 
 
 
     let associate = new Associate({
-        name: name,
         personalEmail: 'sinemail@sinemail.com',
         cellphone: movil,
         bank: bankId,
@@ -107,13 +98,8 @@ let createAssociate = async(data) => {
         rfc: rfc,
         address: address,
         birthDate: birthDate,
-        hasPayment: hasPayment,
         payAmmount: payAmmount,
-        state: stateId,
-        paymentDate: null,
-        paymentNumber: 0,
-        creationDate: new Date(),
-        id: data[0]
+        state: stateId
     });
     let newAssociate;
     try {
@@ -129,16 +115,67 @@ let createAssociate = async(data) => {
     }
 }
 
-let createPosition = async(data) => {
-
+let createPosition = async(data, associateId) => {
+    let position = new Position({
+        associate: associateId,
+        payAmmount: 100,
+        hasPayment: true,
+        paymentDate: new Date(),
+        paymentNumber: 0,
+        isFirst: true
+    });
+    let newPosition;
+    try {
+        newPosition = await position.save();
+        if (!newPosition) {
+            console.log(newPosition);
+        }
+    } catch (error) {
+        console.log("Error al salvar la posicion" + data[0]);
+        console.log(error);
+    } finally {
+        return (newPosition) ? newPosition : null;
+    }
 }
 
-let createUser = async(data) => {
-
+let createUser = async(data, positionNumber, cellphone) => {
+    let name = replaceSpecialChars(data[1], false);
+    let lastname = replaceSpecialChars(data[2], false);
+    let username = name.substring(0, 1).toUpperCase() + lastname.substring(0, 1).toUpperCase() + positionNumber + cellphone.substring(cellphone.length - 2, cellphone.length);
+    let user = new User({
+        name: sentUser.name,
+        lastname: sentUser.lastname,
+        username: username,
+        password: bcrypt.hashSync("lograndosuenos7", 10),
+    });
+    let newUser;
+    try {
+        newUser = await user.save();
+        if (!newUser) {
+            console.log(newUser);
+        }
+    } catch (error) {
+        console.log("Error al salvar el usuario" + data[0]);
+        console.log(error);
+    } finally {
+        return (newUser) ? newUser : null;
+    }
 }
 
 let linkAssociateUser = async(associate, userId) => {
-
+    associate.user = userId
+    let newAssociate;
+    try {
+        newAssociate = await associate.save();
+        if (!newAssociate) {
+            console.log(associate);
+        }
+    } catch (error) {
+        console.log("Error al salvar el afiliado" + data[0]);
+        console.log(error);
+    } finally {
+        return (newAssociate) ? newAssociate : null;
+    }
 }
 
 let replaceSpecialChars = (value, replaceSpaces = true) => {

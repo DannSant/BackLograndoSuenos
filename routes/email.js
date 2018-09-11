@@ -142,9 +142,6 @@ function createHtmlBody(userEmail, userName, userUserName, userPassword) {
         </tr>
     </table>
 
-    <h3 style='color:darkred'> <u>😱¡Importante!😱 </u></h3>
-    <h3 style='color:darkred'> No cambiar contraseña de correo y usuario de mexicaos unidos </h3>
-
     <p>No olvides tambien descargar la aplicacion de Thunderbird en https://www.thunderbird.net/es-ES/ </p>
 
     Gracias!!
