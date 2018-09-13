@@ -195,6 +195,36 @@ app.post('/position/add/:id', (req, res) => {
 
     })
 });
+
+app.post('/position/resetId', (req, res) => {
+    //let Associate = connection.model('Book', bookSchema),
+    position = new Position();
+
+    position.save(function(err) {
+
+        // book._id === 100 -> true
+
+        position.nextCount(function(err, count) {
+
+            // count === 101 -> true
+
+            position.resetCount(function(err, nextCount) {
+
+                // nextCount === 100 -> true
+
+                res.json({
+                    ok: true,
+                    nextCount: nextCount,
+                    count: count
+                });
+
+            });
+
+        });
+
+    });
+})
+
 //=======================
 // PETICIONES PUT
 //=======================

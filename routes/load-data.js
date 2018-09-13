@@ -1,10 +1,13 @@
 const express = require('express');
 const fs = require("fast-csv")
 const _ = require('underscore');
+const bcrypt = require('bcryptjs');
 const app = express();
 const Associate = require('../models/associate');
 const Bank = require('../models/bank');
 const State = require('../models/state')
+const Position = require('../models/position')
+const User = require('../models/user')
 
 
 let bankCatalog;
@@ -26,7 +29,7 @@ app.post('/loadData', async(req, res) => {
                 .on("data", async(data) => {
                     let newAssociate = await createAssociate(data);
                     let newPosition = await createPosition(data, newAssociate._id);
-                    let newUser = await createUser(data)
+                    let newUser = await createUser(data, newPosition.position_number, newAssociate.cellphone)
                     let associateWithUser = await linkAssociateUser(newAssociate, newUser._id);
                 })
                 .on("end", function() {
@@ -42,12 +45,12 @@ app.post('/loadData', async(req, res) => {
 });
 
 let createAssociate = async(data) => {
-    let bank = replaceSpecialChars(data[3]);
-    let account = replaceSpecialChars(data[4]);
-    let clabe = replaceSpecialChars(data[5]);
-    let card = replaceSpecialChars(data[6]);
+    let bank = replaceSpecialChars(data[4]);
+    let account = replaceSpecialChars(data[5]);
+    let clabe = replaceSpecialChars(data[6]);
+    let card = replaceSpecialChars(data[7]);
 
-    let dateArray = data[7].split(" ");
+    let dateArray = data[8].split(" ");
     let day = dateArray[0];
     let month = dateArray[1];
     month = month - 1;
@@ -59,11 +62,12 @@ let createAssociate = async(data) => {
         birthDate = new Date(year, month, day);
     }
 
-    let curp = replaceSpecialChars(data[8]);
-    let rfc = replaceSpecialChars(data[9]);
-    let movil = replaceSpecialChars(data[10]);
-    let address = replaceSpecialChars(data[11], false);
-    let state = replaceSpecialChars(data[12], false);
+    let curp = replaceSpecialChars(data[9]);
+    let rfc = replaceSpecialChars(data[10]);
+    rfc = (rfc == '' || rfc == undefined) ? 'SINRFC000000' : rfc;
+    let movil = replaceSpecialChars(data[11]);
+    let address = replaceSpecialChars(data[12], false);
+    let state = replaceSpecialChars(data[13], false);
 
     let bankId = findBankId(bank);
     let stateId = findStateId(state)
@@ -98,7 +102,6 @@ let createAssociate = async(data) => {
         rfc: rfc,
         address: address,
         birthDate: birthDate,
-        payAmmount: payAmmount,
         state: stateId
     });
     let newAssociate;
@@ -143,8 +146,8 @@ let createUser = async(data, positionNumber, cellphone) => {
     let lastname = replaceSpecialChars(data[2], false);
     let username = name.substring(0, 1).toUpperCase() + lastname.substring(0, 1).toUpperCase() + positionNumber + cellphone.substring(cellphone.length - 2, cellphone.length);
     let user = new User({
-        name: sentUser.name,
-        lastname: sentUser.lastname,
+        name: name,
+        lastname: lastname,
         username: username,
         password: bcrypt.hashSync("lograndosuenos7", 10),
     });
@@ -171,7 +174,7 @@ let linkAssociateUser = async(associate, userId) => {
             console.log(associate);
         }
     } catch (error) {
-        console.log("Error al salvar el afiliado" + data[0]);
+        console.log("Error al ligar el afiliado" + data[0]);
         console.log(error);
     } finally {
         return (newAssociate) ? newAssociate : null;
@@ -198,6 +201,9 @@ let replaceSpecialChars = (value, replaceSpaces = true) => {
 
 let findBankId = (bankDesc) => {
     let id;
+    if (!bankDesc) {
+        return "5b7f83a305fc270014823f1e";
+    }
     for (let bank of bankCatalog) {
         if (bank.name.toLowerCase() == bankDesc.toLowerCase()) {
             id = bank._id;
@@ -205,18 +211,23 @@ let findBankId = (bankDesc) => {
         }
     }
 
-    return id ? id : "5b5946f504fec32c0cc356e9";
+    return id ? id : "5b7f83a305fc270014823f1e";
 }
 
 let findStateId = (stateDesc) => {
     let id;
+
+    if (!stateDesc) {
+        return "5b7f85a9e4a0bd838024991f";
+    }
+
     for (let state of stateCatalog) {
         if (state.name.toLowerCase() == stateDesc.toLowerCase()) {
             id = state._id;
             break;
         }
     }
-    return id ? id : "5b779b882b34906d404d21cc";
+    return id ? id : "5b7f85a9e4a0bd838024991f";
 }
 
 app.get('/getMissingData', (req, res) => {
