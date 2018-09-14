@@ -142,7 +142,7 @@ app.get('/position/all', (req, res) => {
 
 
     Position.find({ status: true })
-        .populate({ path: 'associate', populate: { path: 'user' } })
+        .populate({ path: 'associate', populate: { path: 'user bank state' } })
         .exec((error, positions) => {
             if (error) {
                 return res.status(500).json({

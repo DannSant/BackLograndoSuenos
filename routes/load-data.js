@@ -125,7 +125,9 @@ let createPosition = async(data, associateId) => {
         hasPayment: true,
         paymentDate: new Date(),
         paymentNumber: 0,
-        isFirst: true
+        isFirst: true,
+        position_number: data[0],
+        email: data[3]
     });
     let newPosition;
     try {
