@@ -127,7 +127,9 @@ let createPosition = async(data, associateId) => {
         paymentNumber: 0,
         isFirst: true,
         position_number: data[0],
-        email: data[3]
+        email: data[3],
+        external_username: data[14],
+        external_password: 'lograndosuenos7'
     });
     let newPosition;
     try {
