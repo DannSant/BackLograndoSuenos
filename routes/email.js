@@ -59,8 +59,8 @@ app.post('/email/welcome', (req, res) => {
         })
     }
 
-    let adminEmail = "pruebas@lograndosuenos7.com";
-    let adminPassword = "Mmadlajca1*";
+    let adminEmail = "bienvenidos@lograndosuenos7.com";
+    let adminPassword = "lograndosuenos7";
 
     let subject = `Bienvenido ${userName} a Logrando Sueños 7 🤗`
     let htmlBody = createHtmlBody(userEmail, userName, userUserName, userPassword);
@@ -80,7 +80,7 @@ app.post('/email/welcome', (req, res) => {
 
     // setup email data with unicode symbols
     let mailOptions = {
-        from: '"Staff LograndoSueños7" <pruebas@lograndosuenos7.com>', // sender address
+        from: '"Staff LograndoSueños7" <bienvenidos@lograndosuenos7.com>', // sender address
         to: personalEmail, // list of receivers
         subject: subject, // Subject line
         text: 'Hello world?', // plain text body
