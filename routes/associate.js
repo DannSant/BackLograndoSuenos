@@ -49,7 +49,6 @@ app.get('/associate/all', (req, res) => {
 
     Associate.find({ status: true })
         .skip(desde)
-        .limit(limite)
         .populate('bank')
         .populate('state')
         .populate('user')
@@ -72,6 +71,35 @@ app.get('/associate/all', (req, res) => {
 
         })
 });
+
+app.get('/associate/search/:searchTerm', (req, res) => {
+    let termino = req.params.searchTerm;
+    console.log(termino);
+
+    Associate.find({ status: true })
+        .populate('bank')
+        .populate('state')
+        .populate('user')
+        .exec((error, associates) => {
+            if (error) {
+                return res.status(500).json({
+                    ok: false,
+                    errorCode: 500,
+                    error
+                })
+            }
+
+            Associate.count({ status: true }, (e, conteo) => {
+                res.json({
+                    ok: true,
+                    records: conteo,
+                    data: filterUserByName(termino, associates)
+                })
+            })
+
+        })
+});
+
 
 //regresa los asociados nuevos (que no tengan email)
 app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
@@ -217,6 +245,28 @@ app.put('/associate/:id', [verificaToken], function(req, res) {
 
     });
 });
+
+
+
+//Funciones
+
+let filterUserByName = (term, data) => {
+    let regexp = new RegExp(term, 'i')
+    let new_data = [];
+    for (idx in data) {
+        let element = data[idx];
+
+        let name = element.user.name;
+        let lastname = element.user.lastname;
+        if (regexp.test(name) || regexp.test(lastname)) {
+            new_data.push(element);
+        }
+    }
+
+
+
+    return new_data;
+}
 
 
 //=======================

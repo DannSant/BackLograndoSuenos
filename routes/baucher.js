@@ -42,6 +42,9 @@ app.put('/baucher/:id', function(req, res) {
         });
     }
 
+    let urlFile = req.body.urlFile;
+
+
     //Validar extensiones
     let archivo = req.files.archivo
     let nombreArchivo = archivo.name.split(".");
@@ -72,14 +75,14 @@ app.put('/baucher/:id', function(req, res) {
             });
 
         //imagen cargada 
-        imagenPosition(id, res, nombreArchivoGuardar);
+        imagenPosition(id, res, nombreArchivoGuardar, urlFile);
 
 
     });;
 
 });
 
-function imagenPosition(id, res, nombreArchivo) {
+function imagenPosition(id, res, nombreArchivo, urlFile) {
     Position.findById(id, (error, positionDB) => {
         if (error) {
             borrarArchivo(nombreArchivo)
@@ -100,13 +103,13 @@ function imagenPosition(id, res, nombreArchivo) {
         }
         borrarArchivo(positionDB.paymentBaucher)
 
-        positionDB.paymentBaucher = nombreArchivo;
+        positionDB.paymentBaucher = urlFile;
 
         positionDB.save((errorSave, positionSaved) => {
             if (errorSave) {
                 return res.status(500).json({
                     ok: false,
-                    error:errorSave
+                    error: errorSave
                 })
             }
             res.json({
