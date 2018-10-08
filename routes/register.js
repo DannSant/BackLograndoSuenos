@@ -43,6 +43,7 @@ app.post('/register', (req, res) => {
         address: sentAssociate.address,
         birthDate: sentAssociate.birthDate,
         state: state,
+        userReference: sentAssociate.userReference,
         creationDate: new Date()
     });
 

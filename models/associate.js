@@ -17,6 +17,7 @@ var associateSchema = new Schema({
     state: { type: Schema.Types.ObjectId, ref: 'State', required: false },
     creationDate: { type: Date },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: false },
+    userReference: { type: Schema.Types.ObjectId, ref: 'User', required: false },
     status: { type: Boolean, default: true }
 });
 

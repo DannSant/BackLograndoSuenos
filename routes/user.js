@@ -78,12 +78,44 @@ app.get('/user/all', [verificaToken, verificaAdmin], (req, res) => {
         })
 })
 
+app.get('/user/search/:term', (req, res) => {
+
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let limite = req.query.limite || 5;
+    limite = Number(limite);
+
+    let termino = req.params.term;
+
+    User.find({ status: true })
+        .skip(desde)
+        .exec((error, usuarios) => {
+            if (error) {
+                return res.status(400).json({
+                    ok: false,
+                    error
+                })
+            }
+
+            User.count({ status: true }, (e, conteo) => {
+                res.json({
+                    ok: true,
+                    records: conteo,
+                    data: filterUserByName(termino, usuarios)
+                })
+            })
+
+        })
+})
+
 
 //=======================
 // PETICIONES POST
 //=======================
 
 app.post('/user/admin', (req, res) => {
+    return
     let body = req.body;
     let usuario = new User({
         name: body.name,
@@ -207,7 +239,7 @@ app.put('/user/:id', [verificaToken], function(req, res) {
     if (req.body.password == '') {
         body = _.pick(req.body, ['name', 'username']);
     } else {
-        body = _.pick(req.body, ['name', 'username', 'password']);
+        body = _.pick(req.body, ['name', 'lastname', 'username', 'password']);
         body.password = bcrypt.hashSync(body.password, 10);
     }
 
@@ -271,6 +303,26 @@ app.put('/user/changeRol/:id/', [verificaToken, verificaAdmin], function(req, re
 //=======================
 // PETICIONES DELETE
 //=======================
+
+
+//Funciones
+let filterUserByName = (term, data) => {
+    let regexp = new RegExp(term, 'i')
+
+    let new_data = [];
+    for (idx in data) {
+        let element = data[idx];
+
+        let name = element.name;
+        let lastname = element.lastname;
+
+        if (regexp.test(name) || regexp.test(lastname)) {
+            new_data.push(element);
+        }
+    }
+
+    return new_data;
+}
 
 
 //=======================

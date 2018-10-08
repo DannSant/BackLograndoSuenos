@@ -19,6 +19,7 @@ app.get('/associate', (req, res) => {
         .populate('bank')
         .populate('state')
         .populate('user')
+        .populate('userReference')
         .exec((error, associate) => {
             if (error) {
                 return res.status(500).json({
@@ -74,7 +75,6 @@ app.get('/associate/all', (req, res) => {
 
 app.get('/associate/search/:searchTerm', (req, res) => {
     let termino = req.params.searchTerm;
-    console.log(termino);
 
     Associate.find({ status: true })
         .populate('bank')
@@ -110,7 +110,7 @@ app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
     let limite = req.query.limite || 20;
     limite = Number(limite);
 
-    Associate.find({ email: null })
+    Associate.find({ email: null, status: true })
         .skip(desde)
         .limit(limite)
         .exec((error, associates) => {
@@ -208,7 +208,7 @@ app.post('/associate/resetId', (req, res) => {
 //=======================
 app.put('/associate/:id', [verificaToken], function(req, res) {
     let code = req.params.id;
-    let body = _.pick(req.body, ['personalEmail', 'cellphone', 'bank', 'account', 'clabe', 'card', 'curp', 'rfc', 'address', 'state', 'birthDate']);
+    let body = _.pick(req.body, ['personalEmail', 'cellphone', 'bank', 'account', 'clabe', 'card', 'curp', 'rfc', 'address', 'state', 'birthDate', 'userReference']);
     //console.log(req.body);
 
 
@@ -237,14 +237,57 @@ app.put('/associate/:id', [verificaToken], function(req, res) {
                 }
             })
         }
-
-        res.json({
-            ok: true,
-            data: associateDB
-        });
+        updateUser(req.body.user, associateDB, res);
+        // res.json({
+        //     ok: true,
+        //     data: associateDB
+        // });
 
     });
 });
+
+let updateUser = (userBody, updatedAssociate, res) => {
+    let code = updatedAssociate.user._id;
+    let body = {};
+
+
+    body = _.pick(userBody, ['name', 'lastname']);
+
+
+
+    //console.log(body);
+
+    User.findByIdAndUpdate(code, body, { new: true, runValidators: true }, (error, usuarioDB) => {
+        if (error) {
+            return res.status(409).json({
+                ok: false,
+                error
+            })
+        }
+
+        if (!usuarioDB) {
+            return res.status(400).json({
+                ok: false,
+                error: {
+                    message: "No se encontró al usuario a actualizar"
+                },
+                extra: {
+                    message: "El afiliado si se ha actualizado",
+                    associate: updatedAssociate
+                }
+            })
+        }
+
+        res.json({
+            ok: true,
+            data: {
+                user: usuarioDB,
+                associate: updatedAssociate
+            }
+        });
+
+    });
+}
 
 
 
