@@ -315,6 +315,11 @@ let filterUserByName = (term, data) => {
 
         let name = element.name;
         let lastname = element.lastname;
+        let username = element.username;
+
+        if (username != "admin" && username != "admin2" && username != "admin3") {
+            continue;
+        }
 
         if (regexp.test(name) || regexp.test(lastname)) {
             new_data.push(element);
