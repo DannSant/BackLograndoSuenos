@@ -114,6 +114,7 @@ app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
     Associate.find({ email: null, status: true })
         .skip(desde)
         .limit(limite)
+        .populate("user")
         .exec((error, associates) => {
             if (error) {
                 return res.status(500).json({
