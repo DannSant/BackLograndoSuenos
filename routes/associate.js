@@ -53,6 +53,7 @@ app.get('/associate/all', (req, res) => {
         .populate('bank')
         .populate('state')
         .populate('user')
+        .populate('userReference')
         .exec((error, associates) => {
             if (error) {
                 return res.status(500).json({
