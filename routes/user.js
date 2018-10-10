@@ -317,7 +317,7 @@ let filterUserByName = (term, data) => {
         let lastname = element.lastname;
         let username = element.username;
 
-        if (username != "admin" && username != "admin2" && username != "admin3") {
+        if (username == "admin" && username == "admin2" && username == "admin3") {
             continue;
         }
 
