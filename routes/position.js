@@ -19,7 +19,7 @@ app.get('/position/new', [verificaToken, verificaAdmin], (req, res) => {
     let limite = req.query.limite || 20;
     limite = Number(limite);
 
-    Position.find({ email: null })
+    Position.find({ email: null, status: true })
         .skip(desde)
         .limit(limite)
         .populate({ path: 'associate', populate: { path: 'user' } })

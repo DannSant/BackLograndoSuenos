@@ -124,7 +124,7 @@ app.get('/associate/new', [verificaToken, verificaAdmin], (req, res) => {
                 })
             }
 
-            Associate.count({ status: true }, (e, conteo) => {
+            Associate.count({ email: null, status: true }, (e, conteo) => {
                 res.json({
                     ok: true,
                     records: conteo,
