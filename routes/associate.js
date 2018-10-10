@@ -298,11 +298,16 @@ let updateUser = (userBody, updatedAssociate, res) => {
 let filterUserByName = (term, data) => {
     let regexp = new RegExp(term, 'i')
     let new_data = [];
+
     for (idx in data) {
         let element = data[idx];
 
         let name = element.user.name;
+        if (name == "Mitzy") {
+            console.log(regexp.test(name));
+        }
         let lastname = element.user.lastname;
+
         if (regexp.test(name) || regexp.test(lastname)) {
             new_data.push(element);
         }

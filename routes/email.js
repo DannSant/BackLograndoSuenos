@@ -80,7 +80,7 @@ app.post('/email/welcome', (req, res) => {
 
     // setup email data with unicode symbols
     let mailOptions = {
-        from: '"Staff LograndoSueños7" <bienvenidos@lograndosuenos7.com>', // sender address
+        from: '"LograndoSueños7" <bienvenidos@lograndosuenos7.com>', // sender address
         to: personalEmail, // list of receivers
         subject: subject, // Subject line
         text: 'Hello world?', // plain text body
