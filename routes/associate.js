@@ -296,7 +296,7 @@ let updateUser = (userBody, updatedAssociate, res) => {
 //Funciones
 
 let filterUserByName = (term, data) => {
-    let regexp = new RegExp(term, 'i')
+    let regexp = new RegExp(term, 'gmi')
     let new_data = [];
 
     for (idx in data) {
