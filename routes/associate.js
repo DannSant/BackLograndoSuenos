@@ -306,6 +306,9 @@ let filterUserByName = (term, data) => {
 
         let lastname = element.user.lastname;
 
+        console.log(name, regexp.test(name))
+        console.log(lastname, regexp.test(lastname))
+
         if (regexp.test(name) || regexp.test(lastname)) {
             new_data.push(element);
         }
